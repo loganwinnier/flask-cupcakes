@@ -21,7 +21,8 @@ connect_db(app)
 
 @app.get("/api/cupcakes")
 def get_all_cupcake_data():
-    """Get all cupcake data returns JSON like {cupcakes: [{id, flavor, size, rating, image_url}, ...]}"""
+    """Get all cupcake data returns JSON like
+    {cupcakes: [{id, flavor, size, rating, image_url}, ...]}"""
 
     cupcakes = Cupcake.query.all()
     cupcakes_serialized = [c.serialize() for c in cupcakes]
@@ -31,7 +32,8 @@ def get_all_cupcake_data():
 
 @app.get("/api/cupcakes/<int:cupcake_id>")
 def get_cupcake(cupcake_id):
-    """Get data about a single cupcake, returns JSON like {cupcake: {id, flavor, size, rating, image_url}}"""
+    """Get data about a single cupcake, returns JSON like
+    {cupcake: {id, flavor, size, rating, image_url}}"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized_cupcake = cupcake.serialize()

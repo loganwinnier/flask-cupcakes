@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <form action="submit">
+    <label for="flavor">Flavor:</label>
+    <input required type="text" name="flavor" id="flavor">
+    <label for="flavor">Size:</label>
+    <input required type="text" name="size" id="size">
+    <label for="flavor">Rating:</label>
+    <input required type="text" name="rating" id="rating">
+    <label for="flavor">Image URL:</label>
+    <input required type="text" name="image-url" id="image-url">
+  </form>
+
+  <ul id="cupcake-list">
+      <!--cupcake list goes here-->
+  </ul>
+
+{% endblock %}
