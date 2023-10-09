@@ -76,10 +76,29 @@ def update_cupcake(cupcake_id):
         if not cupcake_modification[key]:
             cupcake_modification[key] = None
 
-    cupcake.flavor = cupcake_modification.get("flavor", cupcake.flavor)
-    cupcake.size = cupcake_modification.get("size", cupcake.size)
-    cupcake.rating = cupcake_modification.get("rating", cupcake.rating)
-    cupcake.image = cupcake_modification.get("image_url", cupcake.image_url)
+    cupcake.flavor = (
+        cupcake_modification.get("flavor")
+        if cupcake_modification.get("flavor")
+        else cupcake.flavor
+    )
+
+    cupcake.size = (
+        cupcake_modification.get("size")
+        if cupcake_modification.get("size")
+        else cupcake.size
+    )
+
+    cupcake.rating = (
+        cupcake_modification.get("rating")
+        if cupcake_modification.get("rating")
+        else cupcake.rating
+    )
+
+    cupcake.image_url = (
+        cupcake_modification.get("image_url")
+        if cupcake_modification.get("image_url")
+        else cupcake.image_url
+    )
 
     db.session.commit()
 
