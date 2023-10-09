@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+DEFAULT_IMAGE_URL = "https://tinyurl.com/demo-cupcake"
+
 
 def connect_db(app):
     """Connect to database."""
@@ -38,7 +40,9 @@ class Cupcake(db.Model):
     )
 
     image_url = db.Column(
-        db.String(500), nullable=False, default="https://tinyurl.com/demo-cupcake"
+        db.String(500),
+        nullable=False,
+        default=DEFAULT_IMAGE_URL,
     )
 
     def serialize(self):
