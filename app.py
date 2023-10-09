@@ -66,44 +66,30 @@ def create_cupcake():
 
 @app.patch("/api/cupcakes/<int:cupcake_id>")
 def update_cupcake(cupcake_id):
-    """Update a cupcake using the id passed in the URL and the
-    cupcake data passed in the body of the request . Return JSON like
+    """Update a cupcake using the id passed in the URL and the optional
+    cupcake id, flavor, size, rating, and image_url passed in the body of the request . Return JSON like
      {cupcake: {id, flavor, size, rating, image_url}}"""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     cupcake_modification = request.json
-    for key in cupcake_modification:
-        if not cupcake_modification[key]:
-            cupcake_modification[key] = None
 
-    cupcake.flavor = (
-        cupcake_modification.get("flavor")
-        if cupcake_modification.get("flavor")
-        else cupcake.flavor
-    )
+    cupcake.flavor = cupcake_modification.get("flavor", cupcake.flavor)
 
-    cupcake.size = (
-        cupcake_modification.get("size")
-        if cupcake_modification.get("size")
-        else cupcake.size
-    )
+    cupcake.size = cupcake_modification.get("size", cupcake.size)
 
-    cupcake.rating = (
-        cupcake_modification.get("rating")
-        if cupcake_modification.get("rating")
-        else cupcake.rating
-    )
+    cupcake.rating = cupcake_modification.get("rating", cupcake.rating)
 
-    cupcake.image_url = (
-        cupcake_modification.get("image_url")
-        if cupcake_modification.get("image_url")
-        else cupcake.image_url
-    )
+    cupcake_img = cupcake_modification.get("image_url")
+    if cupcake_img == "":
+        cupcake.image_url = DEFAULT_IMAGE_URL
+    else:
+        cupcake.image_url = cupcake_img
 
     db.session.commit()
 
     serialized_cupcake = cupcake.serialize()
     return jsonify(cupcake=serialized_cupcake)
+
 
 @app.delete("/api/cupcakes/<int:cupcake_id>")
 def delete_cupcake(cupcake_id):
@@ -116,4 +102,3 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted=[cupcake_id])
-

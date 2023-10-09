@@ -1,6 +1,6 @@
 import os
 
-os.environ["DATABASE_URL"] = 'postgresql:///cupcakes_test'
+os.environ["DATABASE_URL"] = "postgresql:///cupcakes_test"
 
 from unittest import TestCase
 
@@ -8,7 +8,7 @@ from app import app
 from models import db, Cupcake
 
 # Make Flask errors be real errors, rather than HTML pages with error info
-app.config['TESTING'] = True
+app.config["TESTING"] = True
 
 db.drop_all()
 db.create_all()
@@ -17,20 +17,17 @@ CUPCAKE_DATA = {
     "flavor": "TestFlavor",
     "size": "TestSize",
     "rating": 5,
-    "image_url": "http://test.com/cupcake.jpg"
+    "image_url": "http://test.com/cupcake.jpg",
 }
 
 CUPCAKE_DATA_2 = {
     "flavor": "TestFlavor2",
     "size": "TestSize2",
     "rating": 10,
-    "image_url": "http://test.com/cupcake2.jpg"
+    "image_url": "http://test.com/cupcake2.jpg",
 }
 
-MODIFY_TEST = {
-    "flavor":"TestFlavor3",
-    "rating":50
-}
+MODIFY_TEST = {"flavor": "TestFlavor3", "rating": 50}
 
 
 class CupcakeViewsTestCase(TestCase):
@@ -60,15 +57,20 @@ class CupcakeViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
 
             data = resp.json
-            self.assertEqual(data, {
-                "cupcakes": [{
-                    "id": self.cupcake_id,
-                    "flavor": "TestFlavor",
-                    "size": "TestSize",
-                    "rating": 5,
-                    "image_url": "http://test.com/cupcake.jpg"
-                }]
-            })
+            self.assertEqual(
+                data,
+                {
+                    "cupcakes": [
+                        {
+                            "id": self.cupcake_id,
+                            "flavor": "TestFlavor",
+                            "size": "TestSize",
+                            "rating": 5,
+                            "image_url": "http://test.com/cupcake.jpg",
+                        }
+                    ]
+                },
+            )
 
     def test_get_cupcake(self):
         with app.test_client() as client:
@@ -77,15 +79,18 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             data = resp.json
-            self.assertEqual(data, {
-                "cupcake": {
-                    "id": self.cupcake_id,
-                    "flavor": "TestFlavor",
-                    "size": "TestSize",
-                    "rating": 5,
-                    "image_url": "http://test.com/cupcake.jpg"
-                }
-            })
+            self.assertEqual(
+                data,
+                {
+                    "cupcake": {
+                        "id": self.cupcake_id,
+                        "flavor": "TestFlavor",
+                        "size": "TestSize",
+                        "rating": 5,
+                        "image_url": "http://test.com/cupcake.jpg",
+                    }
+                },
+            )
 
     def test_create_cupcake(self):
         with app.test_client() as client:
@@ -94,51 +99,67 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 201)
 
-            cupcake_id = resp.json['cupcake']['id']
+            cupcake_id = resp.json["cupcake"]["id"]
 
             # don't know what ID we'll get, make sure it's an int
             self.assertIsInstance(cupcake_id, int)
 
-            self.assertEqual(resp.json, {
-                "cupcake": {
-                    "id": cupcake_id,
-                    "flavor": "TestFlavor2",
-                    "size": "TestSize2",
-                    "rating": 10,
-                    "image_url": "http://test.com/cupcake2.jpg"
-                }
-            })
+            self.assertEqual(
+                resp.json,
+                {
+                    "cupcake": {
+                        "id": cupcake_id,
+                        "flavor": "TestFlavor2",
+                        "size": "TestSize2",
+                        "rating": 10,
+                        "image_url": "http://test.com/cupcake2.jpg",
+                    }
+                },
+            )
 
             self.assertEqual(Cupcake.query.count(), 2)
 
     def test_update_cupcake(self):
         with app.test_client() as client:
-            resp = client.patch(
-                f"/api/cupcakes/{self.cupcake_id}",
-                json=MODIFY_TEST)
+            resp = client.patch(f"/api/cupcakes/{self.cupcake_id}", json=MODIFY_TEST)
 
-        self.assertEqual(resp.status_code,200)
+        self.assertEqual(resp.status_code, 200)
         self.assertEqual(
-            resp.json, {
-            "cupcake": {
+            resp.json,
+            {
+                "cupcake": {
                     "id": self.cupcake_id,
                     "flavor": "TestFlavor3",
                     "size": "TestSize",
                     "rating": 50,
-                    "image_url": "http://test.com/cupcake.jpg"
+                    "image_url": "http://test.com/cupcake.jpg",
                 }
-        })
+            },
+        )
+        self.assertEqual(Cupcake.query.count(), 1)
+
+    def test_update_non_existant_cupcake(self):
+        with app.test_client() as client:
+            resp = client.patch(
+                "/api/cupcakes/999999",
+                json=MODIFY_TEST,
+            )
+
+        self.assertEqual(resp.status_code, 404)
 
     def test_delete_cupcake(self):
         cupcake = Cupcake.query.get_or_404(self.cupcake_id)
         with app.test_client() as client:
             resp = client.delete(f"/api/cupcakes/{self.cupcake_id}")
 
-        self.assertEqual(resp.status_code,200)
-        self.assertEqual(
-            resp.json,
-            {"deleted": [self.cupcake_id]}
-        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json, {"deleted": [self.cupcake_id]})
         cupcakes = Cupcake.query.all()
-        self.assertNotIn(cupcake,cupcakes)
+        self.assertNotIn(cupcake, cupcakes)
+        self.assertEqual(Cupcake.query.count(), 0)
 
+    def test_delete_non_existant_cupcake(self):
+        with app.test_client() as client:
+            resp = client.delete("/api/cupcakes/999999")
+
+        self.assertEqual(resp.status_code, 404)
