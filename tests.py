@@ -27,6 +27,11 @@ CUPCAKE_DATA_2 = {
     "image_url": "http://test.com/cupcake2.jpg"
 }
 
+MODIFY_TEST = {
+    "flavor":"TestFlavor3",
+    "rating":50
+}
+
 
 class CupcakeViewsTestCase(TestCase):
     """Tests for views of API."""
@@ -105,3 +110,35 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_update_cupcake(self):
+        with app.test_client() as client:
+            resp = client.patch(
+                f"/api/cupcakes/{self.cupcake_id}",
+                json=MODIFY_TEST)
+
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(
+            resp.json, {
+            "cupcake": {
+                    "id": self.cupcake_id,
+                    "flavor": "TestFlavor3",
+                    "size": "TestSize",
+                    "rating": 50,
+                    "image_url": "http://test.com/cupcake.jpg"
+                }
+        })
+
+    def test_delete_cupcake(self):
+        cupcake = Cupcake.query.get_or_404(self.cupcake_id)
+        with app.test_client() as client:
+            resp = client.delete(f"/api/cupcakes/{self.cupcake_id}")
+
+        self.assertEqual(resp.status_code,200)
+        self.assertEqual(
+            resp.json,
+            {"deleted": [self.cupcake_id]}
+        )
+        cupcakes = Cupcake.query.all()
+        self.assertNotIn(cupcake,cupcakes)
+
