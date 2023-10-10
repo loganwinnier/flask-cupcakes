@@ -91,7 +91,7 @@ def update_cupcake(cupcake_id):
     cupcake.rating = cupcake_modification.get("rating", cupcake.rating)
 
     cupcake_img = cupcake_modification.get("image_url")
-    if cupcake_img == "":
+    if not cupcake_img:
         cupcake.image_url = DEFAULT_IMAGE_URL
     else:
         cupcake.image_url = cupcake_img
